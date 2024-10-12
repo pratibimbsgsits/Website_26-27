@@ -13,11 +13,7 @@ async (accessToken, refreshToken, profile, done) => {
     try {
         const existingUser = await User.findOne({ email: profile.emails[0].value });
 
-        if (existingUser) {
-            // If user already exists, generate JWT and proceed
-            const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET);
-            done(null, { user: existingUser, token });
-        } else {
+       if(!existingUser) {
             // Extract necessary information from the profile
             const enroll = profile.emails[0].value; // Assuming email contains enrollment
             let branch = enroll.slice(4, 6).toUpperCase();
@@ -33,7 +29,6 @@ async (accessToken, refreshToken, profile, done) => {
             });
 
             const savedUser = await newUser.save();
-            const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET);
             done(null, { user: savedUser, token });
         }
     } catch (error) {

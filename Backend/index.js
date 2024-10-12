@@ -52,10 +52,9 @@ app.get(
           errorHandler(400, "Inavlid Request", "Enrollment Number Mismatched")
         );
     }
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET);
     res.cookie("access_token", token, { httpOnly: true });
     res.status(200).json(req.user); // Send back user data excluding sensitive information
-    res.redirect('/home')
+    res.redirect("/home");
   }
 );
 
