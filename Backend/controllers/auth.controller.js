@@ -1,48 +1,49 @@
-import User from './../models/user.model.js';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import User from './models/User.js'; // Assuming your User model is an ES module
 import jwt from 'jsonwebtoken';
 
 
-export const google = async(req,res,next)=>{
-    try{
-        const user = await User.findOne({email : req.body.email})
-        if(user){
-              const token = jwt.sign({id : user._id},process.env.JWT_SECRET);
-              const {enrollment:enro,...rest}=user._doc;
-              res.cookie('access_token',token,{httpOnly :true})
-              res.status(200).json(rest);
-              
-        }else{
+passport.use(new GoogleStrategy({
+    clientID: "438281789353-0sp0v5rmqvb54qvp63vl13os0m998hns.apps.googleusercontent.com",
+    clientSecret: "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",
+    callbackURL: 'http://localhost:3000/auth/google/callback'
+},
+async (accessToken, refreshToken, profile, done) => {
+    try {
+        const existingUser = await User.findOne({ email: profile.emails[0].value });
 
-            if(req.body.enrollment==false){
-                return next(errorHandler(404,'User not found'));
-            }
-            console.log(req.body);
-            
-            let enroll = req.body.enrollment;
-            let branch =enroll.slice(4, 6).toUpperCase();
-            let batch = enroll.slice(6,8);
+        if (existingUser) {
+            // If user already exists, generate JWT and proceed
+            const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET);
+            done(null, { user: existingUser, token });
+        } else {
+            // Extract necessary information from the profile
+            const enroll = profile.emails[0].value; // Assuming email contains enrollment
+            let branch = enroll.slice(4, 6).toUpperCase();
+            let batch = enroll.slice(6, 8);
 
-             const newUser = new User({name : req.body.name,email : req.body.email,avatar : req.body.photo,batch,branch,enrollment : enroll});
-             await newUser.save();
+            const newUser = new User({
+                name: profile.displayName,
+                email: profile.emails[0].value,
+                avatar: profile.photos[0].value,
+                batch,
+                branch,
+                enrollment: enroll
+            });
 
-
-             const token=jwt.sign({id:newUser._id},process.env.JWT_SECRET);
-             const {enrollment:enro,...rest}=newUser._doc;
-             res.cookie('access_token',token,{httpOnly:true})
-             .status(200)
-             .json(rest);
+            const savedUser = await newUser.save();
+            const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET);
+            done(null, { user: savedUser, token });
         }
-    }catch(error){
-        next(error);
+    } catch (error) {
+        done(error, null);
     }
-}
+}));
+passport.serializeUser((userData, done) => {
+    done(null, userData);
+});
 
-
-export const signOut = async(req,res,next)=>{
-    try{
-       res.clearCookie('access_token')
-       res.status(200).json('Sign out successfully');
-    }catch(error){
-       next(error);
-    }
-}
+passport.deserializeUser((userData, done) => {
+    done(null, userData);
+});
