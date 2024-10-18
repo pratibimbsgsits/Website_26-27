@@ -4,8 +4,15 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "migration:all:up": "npx knex migrate:latest",
+    "migration:all:down": "npx knex migrate:rollback --all",
+    "migration:status": "npx knex migrate:list",
+    "seed:create": "npx knex seed:make",
+    "seed:run": "npx knex seed:run",
+    "migrations": " npx knex migrate:latest --knexfile knexfile.js",
+    "for_init": "npx knex migrate:make init --migrations-directory migrations"
   },
   "keywords": [],
   "author": "",
@@ -16,10 +23,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
     "mongoose": "^8.7.0",
     "nodemon": "^3.1.7",
     "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "pg": "^8.13.0"
   }
 }
