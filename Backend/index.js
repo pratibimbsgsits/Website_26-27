@@ -31,9 +31,8 @@ app.use(express.json()); // Parse JSON bodies
 passport.use(
   new GoogleStrategy(
     {
-      clientID:
-        "438281789353-2nnhm6dnuafb1mq7oosfmm46m3e9ornp.apps.googleusercontent.com",
-      clientSecret: "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",
+      clientID: process.env.GOOGLE_OAUTH_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
       callbackURL: "http://localhost:3000/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -54,7 +53,7 @@ passport.use(
           };
         }
 
-        const [savedUser] = await db("users").insert(newUser).returning("*");
+        const savedUser = await db("users").insert(newUser).returning("*");
 
         done(null, savedUser);
       } catch (error) {
@@ -82,7 +81,13 @@ app.post("/enter-enrollment", (req, res) => {
   if (!enrollment) {
     return res
       .status(400)
-      .json({ success: false, message: "Enrollment number is required." });
+      .send(
+        errorHandler(
+          400,
+          "Bad Request",
+          "Enrollment number missing.PLease Enter the Enrollment Number."
+        )
+      );
   }
 
   // Store enrollment number in session
@@ -119,9 +124,9 @@ app.get(
     const updatedUser = await db("users")
       .where({ id: req.user.id }) // Assuming req.user contains the authenticated user
       .update({
-        branch: branch,
-        batch: batch,
-        enrollment_number: enrollment,
+        branch,
+        batch,
+        enrollment,
       })
       .returning("*"); // Return the updated user
 
