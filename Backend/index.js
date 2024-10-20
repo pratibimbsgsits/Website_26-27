@@ -38,8 +38,9 @@ app.use(authRouter);
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_OAUTH_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+      clientID:
+        "438281789353-3vihhtpdhlucolrdv33te9r8l0r4hraq.apps.googleusercontent.com",
+      clientSecret: "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",
       callbackURL: "http://localhost:3000/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -51,36 +52,46 @@ passport.use(
 
         if (existingUser) {
           return done(null, existingUser);
-        } else {
-          // If user doesn't exist, insert new user
-          const newUser = {
-            name: profile.displayName,
-            email: profile.emails[0].value,
-            avatar: profile.photos[0].value,
-          };
+        }
 
-          const savedUser = await db("users").insert(newUser).returning("*");
+        const newUser = {
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          avatar: profile.photos[0].value,
+        };
+
+        const [savedUser] = await db("users").insert(newUser).returning("*");
+
+        if (savedUser) {
           return done(null, savedUser);
+        } else {
+          return done(null, false, { message: "User registration failed" });
         }
       } catch (error) {
-        done(error, null);
+        console.error("Error during Google authentication", error);
+        return done(error, null);
       }
     }
   )
 );
 
-// Serialize user information into the session
 passport.serializeUser((user, done) => {
-  done(null, user.id); // Assuming 'id' is the unique identifier for the user
+  done(null, user.id);
 });
 
-// Deserialize user information from the session
 passport.deserializeUser(async (id, done) => {
-  const user = await db("users").where({ id }).first();
-  done(null, user);
+  try {
+    const user = await db("users").where({ id }).first();
+    if (user) {
+      done(null, user); // User is found and attached to req.user
+    } else {
+      done(null, false, { message: "User not found" });
+    }
+  } catch (error) {
+    done(error, null);
+  }
 });
 
-// Start the server
-app.listen(8080, () => {
-  console.log("Server is running on port 8080!");
+app.listen(3000, () => {
+  console.log("Server is running on port 3000!");
 });
