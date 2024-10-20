@@ -1,7 +1,10 @@
 const express = require("express");
 const QRCode = require("qrcode");
+const fs = require('fs')
+const nodemailer = require('nodemailer')
 const db = require("../db/index.js");
 const { errorHandler } = require("../utils/errorHandler");
+const path = require('path'); // Import the path module
 const { response } = require("express");
 
 const getEvents = async (req, res) => {
@@ -98,8 +101,9 @@ const registerEvents = async (req, res) => {
         );
     }
 
-    const qrCodeData = await QRCode.toDataURL(`Event Ticket for ${name}`);
-    console.log(qrCodeData);
+    // Generate QR Code and save it as an image
+    const qrCodeFilePath = path.join(__dirname, 'qr_code.png'); // Define the path for the QR code image
+    await QRCode.toFile(qrCodeFilePath, `Event Ticket for ${name}`); // Save the QR code as a PNG file
 
     let data = {
       event_id,
@@ -107,9 +111,10 @@ const registerEvents = async (req, res) => {
       team_members,
       attendee_name: name,
       attendee_phone: phone,
-      attendee_email: email
+      attendee_email: email,
     };
 
+    // Insert attendee data into the database
     let insertion = await db("attendees").insert(data).returning("*");
     if (!insertion) {
       return res
@@ -122,9 +127,38 @@ const registerEvents = async (req, res) => {
           )
         );
     } else {
+      let transporter = nodemailer.createTransport({
+        service: 'gmail', // Use your email service
+        auth: {
+          user: "eklavyasinghparihar7875@gmail.com",
+          pass: "ybhbhroqrjesdelc", 
+        }
+      });
+
+      const mailOptions = {
+        from: 'eklavyasinghparihar7875@gmail.com',
+        to: email,
+        subject: 'Your Event Ticket',
+        text: `Hello ${name},\nThank you for registering for the event! Your ticket is ready.\nEvent: ${eventExists.event_name}\nTeam: ${team_name}`,
+        attachments: [
+          {
+            filename: 'qr_code.png',
+            path: qrCodeFilePath // Use the path to the saved QR code image
+          }
+        ]
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error sending email:", error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+
       return res.status(200).send({
         response: {
-          data: { insertion, qrCodeData },
+          data: { insertion, qrCodeFilePath }, // Return the file path in response if needed
           title: "Booking Successful",
           message: "Booking Successful for the event",
         },

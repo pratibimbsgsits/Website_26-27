@@ -10,7 +10,7 @@ exports.up = function(knex) {
         table.integer('team_members').notNullable()
         table.string('attendee_name').notNullable()
         table.string('attendee_email').notNullable()
-        table.integer('attendee_phone').notNullable()
+        table.string('attendee_phone').notNullable()
         table.string('qr_code')
         table.timestamps(true,true)
     })
