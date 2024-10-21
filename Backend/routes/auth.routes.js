@@ -1,5 +1,4 @@
 const express = require("express");
-const passport = require("passport");
 const db = require("../db/index.js");
 const jwt = require('jsonwebtoken');
 const errorHandler = require("../utils/errorHandler.js");
@@ -45,7 +44,7 @@ router.post("/api/auth/google", async (req, res,next) => {
       const { enrollment: enro, ...rest } = insertedUser; 
       res.cookie('access_token', token, { httpOnly: true }) 
         .status(200)
-        .json(rest); // Send user data back
+        .json(rest); 
     }
   } catch (error) {
     next(error); 

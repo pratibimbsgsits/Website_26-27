@@ -1,5 +1,5 @@
 import React from 'react'
-import { BackgroundBeamsWithCollision } from './../components/ui/background-beams-with-collision';
+import { BackgroundBeamsWithCollision } from '../components/accertinityui/background-beams-with-collision';
 import { NavbarDemo } from '../components/general/NavbarDemo';
 import { PlaceholdersAndVanishInputDemo } from '../components/general/PlaceholdersAndVanishInputDemo';
 

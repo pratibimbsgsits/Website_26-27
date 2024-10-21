@@ -7,7 +7,7 @@ import { signInFailure, signInSuccess } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { app } from "../firebase";
-import { CardBody, CardContainer } from "../components/ui/3d-card";
+import { CardBody, CardContainer } from "../components/accertinityui/3d-card";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import { toast } from "react-toastify";
 
@@ -107,8 +107,8 @@ export default function SignUp() {
       }}
     >
       <CardContainer className="inter-var">
-        <CardBody className="bg-gradient-to-b to-black text-white relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] border-white/[0.1] w-full sm:w-[30rem] h-auto rounded-xl p-6">
-          <div className="bg-black bg-opacity-90 p-8 rounded-lg shadow-lg w-full text-gray-100 text-sm">
+        <CardBody className=" text-white relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] border-white/[0.1] w-full sm:w-[30rem] h-auto rounded-xl p-6">
+          <div className="bg-black bg-opacity-80 p-8 rounded-lg shadow-lg w-full text-gray-100 text-sm">
             <img
               src="/PratibimbLogo2.png"
               alt="Logo"
@@ -174,7 +174,7 @@ export default function SignUp() {
                     <div className="w-full border-t border-gray-700"></div>
                   </div>
                   <div className="relative text-center">
-                    <span className="bg-black px-2 text-gray-400">OR</span>
+                    <span className="px-2 text-gray-400">OR</span>
                   </div>
                 </div>
 

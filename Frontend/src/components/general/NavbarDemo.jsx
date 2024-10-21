@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { HoveredLink, Menu, MenuItem} from "../ui/navbar-menu";
+import { HoveredLink, Menu, MenuItem} from "../accertinityui/navbar-menu.jsx";
 import { cn } from "../../utils/cn.js";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";

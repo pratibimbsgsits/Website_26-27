@@ -1,13 +1,9 @@
 const express = require("express");
-const session = require("express-session");
-const db = require("./db/index.js");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const passport = require("passport");
 const eventsRouter = require("./routes/events.routes.js");
 const authRouter = require("./routes/auth.routes.js");
-const cookieParser = require("cookie-parser");
-const errorHandler = require("./utils/errorHandler.js");
+
 
 
 dotenv.config();
@@ -19,7 +15,6 @@ app.use(cors());
 app.use(express.json());
 
 
-// Use the routers
 app.use(eventsRouter);
 app.use(authRouter);
 

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { CardBody, CardContainer } from "./components/ui/3d-card";
+import { CardBody, CardContainer } from "./components/accertinityui/3d-card";
 
 export function ThreeDCardDemo() {
   return (
