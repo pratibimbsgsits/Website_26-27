@@ -20,6 +20,7 @@
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "express-session": "^1.18.1",
@@ -32,6 +33,7 @@
     "passport-google-oauth20": "^2.0.0",
     "pg": "^8.13.0",
     "qrcode": "^1.5.4",
+    "razorpay": "^2.9.4",
     "twilio": "^5.3.4"
   }
 }

@@ -1,11 +1,15 @@
-const express = require("express");
 const QRCode = require("qrcode");
-const fs = require('fs')
-const nodemailer = require('nodemailer')
 const db = require("../db/index.js");
+const Razorpay = require("razorpay");
+const crypto = require("crypto")
 const { errorHandler } = require("../utils/errorHandler");
-const path = require('path'); // Import the path module
-const { response } = require("express");
+const sendEmail = require("../utils/sendEmail");
+// const { default: paymentLink } = require("razorpay/dist/types/paymentLink.js");
+
+const razorpay = new Razorpay({
+  key_id: "rzp_test_skSiom6K8tMSxT",
+  key_secret: "5fDFjPzybzKSNMvFGByuGbmN",
+});
 
 const getEvents = async (req, res) => {
   try {
@@ -59,7 +63,6 @@ const registerEvents = async (req, res) => {
         .send(errorHandler(400, "Not Found", "Mentioned Event not found"));
     }
 
-    // Check if the event exists
     const eventExists = await db("events").where({ event_id }).first();
     if (!eventExists) {
       return res
@@ -69,41 +72,36 @@ const registerEvents = async (req, res) => {
         );
     }
 
-    if (!team_name) {
-      return res
-        .status(400)
-        .send(
-          errorHandler(400, "Invalid Request", "Please enter the team name")
-        );
-    }
-
-    if (!team_members) {
+    if (!team_name || !team_members || !name || !email || !phone) {
       return res
         .status(400)
         .send(
           errorHandler(
             400,
             "Invalid Request",
-            "Please enter the number of members attending the event"
+            "Please fill all required fields"
           )
         );
     }
+    const qrCodeData = `Event Ticket for ${name}\nEvent ID: ${event_id}\nTeam: ${team_name}\nMembers: ${team_members}`;
+    await QRCode.toFile("./qr_code.png", qrCodeData);
 
-    if (!name || !email || !phone) {
+    const price = 500 * 100;
+
+    const options = {
+      amount: price,
+      currency: "INR",
+      receipt: `receipt_order_${Date.now()}`,
+    };
+    const order = await razorpay.orders.create(options);
+    console.log(order, "-------------------->");
+    if (!order) {
       return res
-        .status(400)
+        .status(500)
         .send(
-          errorHandler(
-            400,
-            "Invalid Request",
-            "Please enter valid Name, Email, and Phone Number to get tickets"
-          )
+          errorHandler(500, "Order Error", "Failed to create Razorpay order")
         );
     }
-
-    // Generate QR Code and save it as an image
-    const qrCodeFilePath = path.join(__dirname, 'qr_code.png'); // Define the path for the QR code image
-    await QRCode.toFile(qrCodeFilePath, `Event Ticket for ${name}`); // Save the QR code as a PNG file
 
     let data = {
       event_id,
@@ -112,60 +110,29 @@ const registerEvents = async (req, res) => {
       attendee_name: name,
       attendee_phone: phone,
       attendee_email: email,
+      order_id:order.id,
+      payment_status: "PENDING",
     };
 
-    // Insert attendee data into the database
     let insertion = await db("attendees").insert(data).returning("*");
+
     if (!insertion) {
       return res
         .status(400)
         .send(
-          errorHandler(
-            400,
-            "Some Error Occurred",
-            "Error Occurred while making booking"
-          )
+          errorHandler(400, "Error Occurred", "Error while making booking")
         );
-    } else {
-      let transporter = nodemailer.createTransport({
-        service: 'gmail', // Use your email service
-        auth: {
-          user: "eklavyasinghparihar7875@gmail.com",
-          pass: "ybhbhroqrjesdelc", 
-        }
-      });
-
-      const mailOptions = {
-        from: 'eklavyasinghparihar7875@gmail.com',
-        to: email,
-        subject: 'Your Event Ticket',
-        text: `Hello ${name},\nThank you for registering for the event! Your ticket is ready.\nEvent: ${eventExists.event_name}\nTeam: ${team_name}`,
-        attachments: [
-          {
-            filename: 'qr_code.png',
-            path: qrCodeFilePath // Use the path to the saved QR code image
-          }
-        ]
-      };
-
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error("Error sending email:", error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-
-      return res.status(200).send({
-        response: {
-          data: { insertion, qrCodeFilePath }, // Return the file path in response if needed
-          title: "Booking Successful",
-          message: "Booking Successful for the event",
-        },
-      });
     }
+
+    return res.status(200).send({
+      response: {
+        data: { insertion },
+        title: "Booking Successful",
+        message: "Booking Successful for the event",
+      },
+    });
   } catch (error) {
-    console.error("Error while making booking", "-------------------->", error);
+    console.error("Error while making booking:", error);
     return res
       .status(500)
       .send(
@@ -178,7 +145,40 @@ const registerEvents = async (req, res) => {
   }
 };
 
+const paymentVerification = async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      req.body;
+
+    const secret = "5fDFjPzybzKSNMvFGByuGbmN";
+    const hash = crypto
+      .createHmac("sha256", secret)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .digest("hex");
+
+      console.log(hash)
+
+    if (hash === razorpay_signature) {
+      await db("attendees")
+        .where({ order_id: razorpay_order_id })
+        .update({ payment_status: "APPROVED" });
+
+      res.status(200).json({
+        message: "Payment verified successfully",
+        razorpay_payment_id,
+        razorpay_order_id,
+      });
+    } else {
+      res.status(400).json({ message: "Payment verification failed" });
+    }
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
 module.exports = {
   getEvents,
   registerEvents,
+  paymentVerification,
 };
