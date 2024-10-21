@@ -1,70 +1,67 @@
 const express = require("express");
 const passport = require("passport");
 const db = require("../db/index.js");
+const jwt = require('jsonwebtoken');
 const errorHandler = require("../utils/errorHandler.js");
 
 const router = express.Router();
 
-router.post("/enter-enrollment", (req, res) => {
-  const { enrollment } = req.body;
+router.post("/api/auth/google", async (req, res,next) => {
+  try {
+    const { name, email, avatar, enrollment } = req.body;
 
-  if (!enrollment) {
-    return res
-      .status(400)
-      .send(
-        errorHandler(
-          400,
-          "Bad Request",
-          "Enrollment number missing. Please enter the Enrollment Number."
-        )
-      );
+    const existingUser = await db("users").where({ email }).first();
+
+    if (existingUser) {
+      const token = jwt.sign({ id: existingUser.id }, "asdfghjkl");
+      const { enrollment: enro, ...rest } = existingUser; 
+      res.cookie('access_token', token, { httpOnly: true }); 
+      return res.status(200).json(rest); 
+    } else {
+
+      if(req.body.enrollment==false){
+        return next(errorHandler(404,'User not found'));
+    }
+      
+      if (!enrollment || enrollment.length !== 12) {
+        return res.status(404).json(errorHandler(404, 'User not found', 'Invalid enrollment number or user not found'));
+      }
+
+      let branch = enrollment.slice(4, 6).toUpperCase();
+      let batch = enrollment.slice(6, 8);
+
+      const newUser = {
+        name,
+        email,
+        avatar,
+        batch,
+        branch,
+        enrollment,
+      };
+
+      const [insertedUser] = await db("users").insert(newUser).returning("*"); // Insert and return the new user
+
+      const token = jwt.sign({ id: insertedUser.id },"asdfghjkl");
+      const { enrollment: enro, ...rest } = insertedUser; 
+      res.cookie('access_token', token, { httpOnly: true }) 
+        .status(200)
+        .json(rest); // Send user data back
+    }
+  } catch (error) {
+    next(error); 
   }
-
-  req.session.enrollment = enrollment;
-
-  res.redirect("/auth/google");
 });
 
-router.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+router.get("/api/auth/signout",(req,res,next)=>{
+  try{
+    res.clearCookie('access_token');
+    res.status(200).json('Sign out successfully');
+ }catch(error){
+    next(error);
+ }
 
-router.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  async (req, res) => {
-    const enrollment = "0801ME231041";
+})
 
-    if (!enrollment) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Enrollment number is missing." });
-    }
 
-    let branch = enrollment.slice(4, 6).toUpperCase();
-    let batch = enrollment.slice(6, 8);
-
-    const updatedUser = await db("users")
-      .where({ id: req.user.id })
-      .update({
-        branch,
-        batch,
-        enrollment,
-      })
-      .returning("*");
-
-    delete req.session.enrollment;
-
-    if (!updatedUser) {
-      return res.status(400).json({
-        success: false,
-        message: "Error occurred while updating user data",
-      });
-    }
-
-    res.redirect("http://localhost:5173/home");
-  }
-);
 
 module.exports = router;

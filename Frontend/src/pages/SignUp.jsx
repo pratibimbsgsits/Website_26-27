@@ -36,7 +36,7 @@ export default function SignUp() {
           body: JSON.stringify({
             name: result.user.displayName,
             email: result.user.email,
-            photo: result.user.photoURL,
+            avatar: result.user.photoURL,
             enrollment: formData.enrollment,
           }),
         });
@@ -53,6 +53,7 @@ export default function SignUp() {
         toast.success("You're Successfully Signed Up");
       }
     } catch (error) {
+      toast.error("Could not signup with google");
       console.log("could not signup with google", error);
     }
   };

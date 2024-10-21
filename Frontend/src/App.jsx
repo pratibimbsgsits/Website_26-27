@@ -6,16 +6,24 @@ import Profile from './pages/Profile';
 import { ThreeDCardDemo } from './test';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PrivateRoute from './components/general/PrivateRoute';
 
 export default function App() {
   return (
     <>
      <BrowserRouter>
     <Routes>
+
+      <Route element={<PrivateRoute/>}  >
       <Route path='/' element={<Home/>} />
-      <Route path='/sign-in' element={<SignIn/>} />
-      <Route path='/sign-up' element={<SignUp/>} />
       <Route path='/profile' element={<Profile/>} />
+      </Route>
+      
+      <Route path='/sign-in' element={<SignIn/>} />
+
+
+      <Route path='/sign-up' element={<SignUp/>} />
+      
       <Route path='/test' element={<ThreeDCardDemo/>} />
     </Routes>
   </BrowserRouter>
