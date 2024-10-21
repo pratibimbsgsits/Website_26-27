@@ -1,14 +1,14 @@
 const QRCode = require("qrcode");
 const db = require("../db/index.js");
 const Razorpay = require("razorpay");
-const crypto = require("crypto")
+const crypto = require("crypto");
 const { errorHandler } = require("../utils/errorHandler");
 const sendEmail = require("../utils/sendEmail");
-// const { default: paymentLink } = require("razorpay/dist/types/paymentLink.js");
+require("dotenv").config();
 
 const razorpay = new Razorpay({
-  key_id: "rzp_test_skSiom6K8tMSxT",
-  key_secret: "5fDFjPzybzKSNMvFGByuGbmN",
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 const getEvents = async (req, res) => {
@@ -110,7 +110,7 @@ const registerEvents = async (req, res) => {
       attendee_name: name,
       attendee_phone: phone,
       attendee_email: email,
-      order_id:order.id,
+      order_id: order.id,
       payment_status: "PENDING",
     };
 
@@ -156,7 +156,7 @@ const paymentVerification = async (req, res) => {
       .update(razorpay_order_id + "|" + razorpay_payment_id)
       .digest("hex");
 
-      console.log(hash)
+    console.log(hash);
 
     if (hash === razorpay_signature) {
       await db("attendees")
