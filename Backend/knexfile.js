@@ -5,9 +5,9 @@
  */
 module.exports = {
   development: {
-    client: "pg", // PostgreSQL client
+    client: "pg",
     connection:
-      "postgresql://pratibimb_owner:ilNnXD7A9qxW@ep-curly-meadow-a13us44s.ap-southeast-1.aws.neon.tech/pratibimb?sslmode=require",
+      "postgresql://pratibimb_owner:oh5OWqASc4jf@ep-damp-cell-a5jiw3ur.us-east-2.aws.neon.tech/pratibimb?sslmode=require",
     migrations: {
       directory: "./migrations",
     },
