@@ -9,10 +9,11 @@ export async function up(knex) {
     table.string('batch')
     table.string('branch')
     table.string('enrollment')
-    table.timestamps(true, true); // Created at and updated at timestamps
+    table.boolean('is_member').defaultTo(false)
+    table.timestamps(true, true); 
   });
 }
 
 export async function down(knex) {
-  return knex.schema.dropTableIfExists('users'); // Drop users table if it exists
+  return knex.schema.dropTableIfExists('users'); 
 }

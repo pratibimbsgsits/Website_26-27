@@ -25,20 +25,19 @@ const changeEnrollment = async (req, res) => {
       enrollment,
       branch,
       batch,
-    }
+    };
     let insertion = await db("users").update(data).where({
       email,
     });
-    if(insertion){
-        return res.status(200).send({
-            response: {
-              data: insertion,
-              title: "Enrollment Updated",
-              message: "Provided Enrollment Updated",
-              status: 200,
-            },
-          });
-
+    if (insertion) {
+      return res.status(200).send({
+        response: {
+          data: insertion,
+          title: "Enrollment Updated",
+          message: "Provided Enrollment Updated",
+          status: 200,
+        },
+      });
     }
   } catch (error) {
     console.log("Error in changing enrollment", "---------------->", error);
@@ -55,5 +54,5 @@ const changeEnrollment = async (req, res) => {
 };
 
 module.exports = {
-    changeEnrollment
-}
+  changeEnrollment,
+};
