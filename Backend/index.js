@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const eventsRouter = require("./routes/events.routes.js");
 const authRouter = require("./routes/auth.routes.js");
+const userRouter = require("./routes/user.routes.js");
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use(eventsRouter);
 app.use(authRouter);
+app.use(userRouter);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000!");
