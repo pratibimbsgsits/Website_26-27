@@ -14,18 +14,28 @@ const razorpay = new Razorpay({
 const getEvents = async (req, res) => {
   try {
     const { status } = req.query;
+
     //console.log("Fetching events with status:", status); // Log the incoming status
     const events = await db("events").select("*").where("status", status).orderBy("start_date", "desc");
     //console.log("Fetched events:", events); // Log the fetched events
 
-    if (!events) {
+
+    let query = db("events").select("*");
+
+    if (status) {
+      query = query.where("status", status);
+    }
+
+    const events = await query;
+
+    if (events.length === 0) {
       return res
-        .status(400)
+        .status(404)
         .send(
           errorHandler(
-            400,
+            404,
             "Not Found",
-            "Events with specified status not found"
+            "No events found with the specified status"
           )
         );
     } else {
@@ -33,7 +43,7 @@ const getEvents = async (req, res) => {
         response: {
           data: events,
           title: "Events Fetched",
-          message: "Events Fetched with specified status",
+          message: "Events fetched successfully",
           status: 200,
         },
       });
@@ -125,6 +135,7 @@ const registerEvents = async (req, res) => {
           errorHandler(400, "Error Occurred", "Error while making booking")
         );
     }
+    await sendEmail(email, name, "./qr_code.png");
 
     return res.status(200).send({
       response: {
