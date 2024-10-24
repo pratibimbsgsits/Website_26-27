@@ -7,7 +7,7 @@ exports.up = function(knex) {
         table.increments("attendee_id").primary()
         table.integer('event_id').notNullable()
         table.string('team_name').notNullable()
-        table.int('team_members').notNullable()
+        table.integer('team_members').notNullable()
         table.string('attendee_name').notNullable()
         table.string('attendee_email').notNullable()
         table.string('attendee_phone').notNullable()

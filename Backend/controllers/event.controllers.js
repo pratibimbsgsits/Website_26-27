@@ -16,9 +16,11 @@ const getEvents = async (req, res) => {
     const { status } = req.query;
 
     //console.log("Fetching events with status:", status); // Log the incoming status
-    const events = await db("events").select("*").where("status", status).orderBy("start_date", "desc");
+    const events = await db("events")
+      .select("*")
+      .where("status", status)
+      .orderBy("start_date", "desc");
     //console.log("Fetched events:", events); // Log the fetched events
-
 
     let query = db("events").select("*");
 
@@ -26,7 +28,7 @@ const getEvents = async (req, res) => {
       query = query.where("status", status);
     }
 
-    const events = await query;
+    // const events = await query;
 
     if (events.length === 0) {
       return res
@@ -62,12 +64,10 @@ const getEvents = async (req, res) => {
   }
 };
 
-
 const registerEvents = async (req, res) => {
   try {
-    const { event_id } = req.query;
+    const { event_id } = req.params;
     const { team_name, team_members, name, email, phone } = req.body;
-    
 
     if (!event_id) {
       return res
