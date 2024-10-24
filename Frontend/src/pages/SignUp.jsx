@@ -42,10 +42,9 @@ export default function SignUp() {
         });
 
         const data = await res.json();
-        console.log(data);
-        if(data.statusCode == 500){
-          toast.error(data.message)
-          signInFailure(data)
+        if (data.statusCode == 500) {
+          toast.error(data.message);
+          signInFailure(data);
           return;
         }
         dispatch(signInSuccess(data));
@@ -83,9 +82,16 @@ export default function SignUp() {
       });
 
       const data = await res.json();
-      
+
+      if (data.errors && data.errors.status == 404) {
+        toast.error(data.errors.detail);
+        signInFailure(data.errors);
+        return;
+      }
+
       dispatch(signInSuccess(data));
       navigate("/");
+      toast.success("You're Successfully Signed In");
     } catch (error) {
       console.log("could not signup with google", error);
     }
@@ -93,7 +99,7 @@ export default function SignUp() {
 
   return (
     <div
-      className="flex items-center justify-center min-h-screen bg-fixed bg-cover bg-center p-4"
+      className="flex items-center justify-center min-h-screen bg-fixed bg-cover bg-center p-4 bg-opacity-50"
       style={{
         backgroundImage: "url('./LandingPageBg.png')",
         backgroundSize: "cover",
@@ -104,13 +110,16 @@ export default function SignUp() {
         top: 0,
         left: 0,
         zIndex: -1,
+       
       }}
     >
-      <CardContainer className="inter-var">
-        <CardBody className=" text-white relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] border-white/[0.1] w-full sm:w-[30rem] h-auto rounded-xl p-6">
-          <div className="bg-black bg-opacity-80 p-8 rounded-lg shadow-lg w-full text-gray-100 text-sm">
+      {/* Dark Overlay */}
+    <div className="absolute inset-0 bg-black opacity-40"></div>
+      <CardContainer className="inter-var z-10" >
+        <CardBody className=" text-black shadow-lg relative group/card  border-white/[0.1] w-full sm:w-[30rem] h-auto rounded-xl p-6">
+          <div className="bg-slate-50 p-8 rounded-lg  w-full text-black text-sm">
             <img
-              src="/PratibimbLogo2.png"
+              src="/PratibimbLogo3.png"
               alt="Logo"
               className="w-24 mx-auto mb-4"
             />
@@ -118,35 +127,33 @@ export default function SignUp() {
             {!AdminAuthenticate ? (
               <div>
                 <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-white">Register</h2>
+                  <h2 className="text-2xl font-bold font-serif">Register</h2>
                 </div>
 
                 <form>
                   <div className="mb-4">
                     <label
                       htmlFor="enrollment"
-                      className="block text-left font-medium text-white"
+                      className="block text-left font-medium"
                     >
                       Enrollment Number
                       <span>
-                      <Tooltip
-                        title="Pratibimb will not disclose your identity to anyone"
-                        placement="right"
-                       
-                      >
-                        <IconButton>
-                          <HelpIcon className="text-white" />
-                        </IconButton>
-                      </Tooltip>
+                        <Tooltip
+                          title="Pratibimb will not disclose your identity to anyone"
+                          placement="right"
+                        >
+                          <IconButton>
+                            <HelpIcon className="text-slate-800" />
+                          </IconButton>
+                        </Tooltip>
                       </span>
-                     
                     </label>
                     <input
                       type="text"
                       id="enrollment"
                       name="enrollment"
                       onChange={handleEnrollmentChange}
-                      className="mt-1 w-full px-4 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg focus:outline-none text-base"
+                      className="mt-1 w-full px-4 py-2 bg-gray-600  text-white   rounded-lg  text-base focus:ring focus:ring-blue-400 focus:outline-none"
                       placeholder="0801XXXXXXXX"
                     />
                   </div>
@@ -154,7 +161,7 @@ export default function SignUp() {
                   <button
                     type="button"
                     onClick={handleGoogleSignUp}
-                    className="w-full flex items-center justify-center bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-700 transition duration-300 text-base"
+                    className="w-full flex items-center justify-center bg-blue-900 py-2 rounded-lg hover:bg-blue-800 transition duration-300 text-base text-white"
                   >
                     <img
                       src="https://www.svgrepo.com/show/355037/google.svg"
@@ -173,8 +180,8 @@ export default function SignUp() {
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-700"></div>
                   </div>
-                  <div className="relative text-center">
-                    <span className="px-2 text-gray-400">OR</span>
+                  <div className="relative flex justify-center">
+                    <span className="bg-white px-2 text-gray-600 ">OR</span>
                   </div>
                 </div>
 
@@ -182,14 +189,14 @@ export default function SignUp() {
                   Already Have an Account? Login with{" "}
                   <span
                     onClick={handleGoogleLogin}
-                    className="cursor-pointer text-white"
+                    className="cursor-pointer text-violet-950"
                   >
                     <GoogleIcon />
                   </span>
                 </div>
 
                 <div
-                  className="cursor-pointer mt-3 flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition duration-200"
+                  className="cursor-pointer mt-3 flex items-center justify-center text-blue-600 hover:text-blue-700 transition duration-200"
                   onClick={() => setAdminAuthenticate(true)}
                 >
                   Admin Login
@@ -199,13 +206,13 @@ export default function SignUp() {
             ) : (
               <div className="text-center">
                 <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold text-white">Admin Login</h2>
+                  <h2 className="text-3xl font-bold text-black">Admin Login</h2>
                 </div>
                 <form>
                   <div className="mb-6">
                     <label
                       htmlFor="username"
-                      className="block text-left font-medium text-white mb-2"
+                      className="block text-left font-medium text-black mb-2"
                     >
                       Admin Username
                     </label>
@@ -213,7 +220,7 @@ export default function SignUp() {
                       type="text"
                       id="username"
                       name="username"
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg focus:ring focus:ring-emerald-500 focus:outline-none"
+                      className="w-full px-4 py-2 bg-gray-600 border border-gray-600 text-white rounded-lg focus:ring focus:ring-blue-400 focus:outline-none"
                       placeholder="admin@example.com"
                     />
                   </div>
@@ -221,7 +228,7 @@ export default function SignUp() {
                   <div className="mb-6">
                     <label
                       htmlFor="password"
-                      className="block text-left font-medium text-white mb-2"
+                      className="block text-left font-medium text-black mb-2"
                     >
                       Password
                     </label>
@@ -229,14 +236,14 @@ export default function SignUp() {
                       type="password"
                       id="password"
                       name="password"
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg focus:ring focus:ring-emerald-500 focus:outline-none"
+                      className="w-full px-4 py-2 bg-gray-600 border border-gray-600 text-slate-50 rounded-lg focus:ring focus:ring-blue-400 focus:outline-none"
                       placeholder="Enter your password"
                     />
                   </div>
 
                   <div className="flex justify-between items-center mb-6">
                     <div
-                      className="cursor-pointer text-emerald-400 hover:text-emerald-300 transition duration-200"
+                      className="cursor-pointer text-blue-800 hover:text-blue-900 transition duration-200"
                       onClick={() => setAdminAuthenticate(false)}
                     >
                       User Login
@@ -244,7 +251,7 @@ export default function SignUp() {
                     </div>
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none transition duration-300"
+                      className="px-6 py-2 bg-blue-700 text-slate-50 rounded-lg hover:bg-blue-600 focus:outline-none transition duration-300"
                     >
                       Submit
                     </button>

@@ -13,7 +13,7 @@ const razorpay = new Razorpay({
 
 const getEvents = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status } = req.query;
     console.log("Fetching events with status:", status); // Log the incoming status
     const events = await db("events").select("*").where("status", status);
     console.log("Fetched events:", events); // Log the fetched events
@@ -51,6 +51,7 @@ const getEvents = async (req, res) => {
       );
   }
 };
+
 
 const registerEvents = async (req, res) => {
   try {

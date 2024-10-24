@@ -1,13 +1,16 @@
 const express = require("express");
 const db = require("../db/index.js");
 const jwt = require('jsonwebtoken');
-const errorHandler = require("../utils/errorHandler.js");
+const { errorHandler } = require("../utils/errorHandler.js");
+
 
 const router = express.Router();
 
 router.post("/api/auth/google", async (req, res,next) => {
   try {
     const { name, email, avatar, enrollment } = req.body;
+    console.log(req.body);
+    
 
     const existingUser = await db("users").where({ email }).first();
 
@@ -19,11 +22,27 @@ router.post("/api/auth/google", async (req, res,next) => {
     } else {
 
       if(req.body.enrollment==false){
-        return next(errorHandler(404,'User not found'));
+        return res
+        .status(404)
+        .send(
+          errorHandler(
+            404,
+            "Not Found",
+            "User with specified email not found"
+          )
+        );
     }
       
       if (!enrollment || enrollment.length !== 12) {
-        return res.status(404).json(errorHandler(404, 'User not found', 'Invalid enrollment number or user not found'));
+        return  res
+        .status(404)
+        .send(
+          errorHandler(
+            404,
+            "Not Found",
+            "Wrong Credentials"
+          )
+        );
       }
 
       let branch = enrollment.slice(4, 6).toUpperCase();
