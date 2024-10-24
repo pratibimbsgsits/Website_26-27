@@ -149,7 +149,7 @@ function Navbar({ className }) {
           <Link
             to={item.path}
             key={idx}
-            className="relative text-white cursor-pointer"
+            className="relative text-white cursor-pointer font-bold"
           >
             <motion.div
               initial={{ opacity: 0.8, y: 0 }}
