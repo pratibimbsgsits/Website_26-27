@@ -1,9 +1,10 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import userReducer from './user/userSlice'
+import eventsReducer from './events/eventsSlice'
 import {persistReducer, persistStore} from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web and AsyncStorage for react
 
-const rootReducer=combineReducers({user : userReducer})
+const rootReducer=combineReducers({user : userReducer,events : eventsReducer})
 
 const persistConfig={
     key:'root',

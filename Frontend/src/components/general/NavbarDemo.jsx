@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { HoveredLink, Menu, MenuItem} from "../accertinityui/navbar-menu.jsx";
 import { cn } from "../../utils/cn.js";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,14 +16,23 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { getAuth, signOut } from "firebase/auth";
 import { toast } from "react-toastify";
-import { signOutFailure, signOutStart, signOutSuccess } from "../../redux/user/userSlice.js";
-import { CoolMode } from './../magicui/cool-mode';
-import { Button } from "@mui/material";
-import AnimationIcon from '@mui/icons-material/Animation';
+import {
+  signOutFailure,
+  signOutStart,
+  signOutSuccess,
+} from "../../redux/user/userSlice.js";
+import { motion } from "framer-motion";
+
+const navItems = [
+  { name: "Team", path: "/team" },
+  { name: "Sponsors", path: "/sponsors" },
+  { name: "Events", path: "/events" },
+  { name: "Contact Us", path: "/contact-us" },
+];
 
 export function NavbarDemo() {
   return (
-    <div className="relative w-full flex items-center justify-center">
+    <div className="relative w-full flex  justify-center ">
       <Navbar className="top-2" />
     </div>
   );
@@ -40,18 +48,18 @@ function Navbar({ className }) {
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
+    
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     dispatch(signOutStart());
-    const res=await fetch('/api/auth/signout');
-        const data = await res.json();
-        console.log(data);
-        
-        if(data.success===false){
-          dispatch(signOutFailure(data.message));
-          return;
-          }
+    const res = await fetch("/api/auth/signout");
+    const data = await res.json();
+
+    if (data.success === false) {
+      dispatch(signOutFailure(data.message));
+      return;
+    }
     signOut(auth)
       .then(() => {
         toast.success("You're Signed Out !");
@@ -80,16 +88,17 @@ function Navbar({ className }) {
     >
       {/* Top User Profile Section */}
       <Box sx={{ padding: "16px", textAlign: "center" }}>
+       { currentUser.avatar && 
         <Avatar
           src={currentUser.avatar} // User avatar
           alt={currentUser.name}
           sx={{ width: 48, height: 48, margin: "auto" }}
-        />
+        />}
         <div className="text-black mt-2">{currentUser.name}</div>
         <div className="text-gray-600 text-sm mb-4">{currentUser.email}</div>
         <List>
           <ListItem disablePadding>
-            <ListItemButton className="hover:bg-blue-500  transition duration-200 ease-in-out">
+            <ListItemButton className="hover:bg-blue-600 rounded-lg transition duration-200 ease-in-out">
               <ListItemIcon sx={{ color: "#333" }}>
                 <AccountCircleIcon />
               </ListItemIcon>
@@ -98,26 +107,25 @@ function Navbar({ className }) {
           </ListItem>
 
           <ListItem disablePadding>
-  <ListItemButton
-    component="button"
-    onClick={handleLogout}
-    sx={{
-      backgroundColor: "#ffcccc",
-      borderRadius: "0.5rem",
-      padding : "0.5rem",
-      transition: "background-color 0.2s ease-in-out", // Transition effect
-      "&:hover": {
-        backgroundColor: "red", // Red background on hover
-      },
-    }}
-  >
-    <ListItemIcon sx={{ color: "#333" }}>
-      <ExitToAppIcon />
-    </ListItemIcon>
-    <ListItemText primary="Log out" />
-  </ListItemButton>
-</ListItem>
-
+            <ListItemButton
+              component="button"
+              onClick={handleLogout}
+              sx={{
+                backgroundColor: "#E97451",
+                borderRadius: "0.5rem",
+                padding: "0.5rem",
+                transition: "background-color 0.2s ease-in-out", // Transition effect
+                "&:hover": {
+                  backgroundColor: "#F88379", // Red background on hover
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: "#333" }}>
+                <ExitToAppIcon />
+              </ListItemIcon>
+              <ListItemText primary="Log out" />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Box>
 
@@ -126,56 +134,57 @@ function Navbar({ className }) {
   );
 
   return (
-    <div
-      className={cn("fixed top-10 inset-x-0 max-w-2xl mx-auto z-50 ", className)}
-    >
-      <Menu setActive={setActive}>
-        {/* Services Menu */}
-        <MenuItem setActive={setActive} active={active} item="Events">
-          <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink href="/web-dev">Web Development</HoveredLink>
-            <HoveredLink href="/interface-design">Interface Design</HoveredLink>
-            <HoveredLink href="/seo">Search Engine Optimization</HoveredLink>
-            <HoveredLink href="/branding">Branding</HoveredLink>
-          </div>
-        </MenuItem>
-
-        {/* Pricing Menu */}
-        <MenuItem setActive={setActive} active={active} item="Pricing">
-          <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink href="/hobby">Hobby</HoveredLink>
-            <HoveredLink href="/individual">Individual</HoveredLink>
-            <HoveredLink href="/team">Team</HoveredLink>
-            <HoveredLink href="/enterprise">Enterprise</HoveredLink>
-          </div>
-        </MenuItem>
-
-        {/* Profile Avatar or Sign In */}
-        <div className="ml-4 flex items-center">
-          {currentUser ? (
-            <span>
-              <Avatar
-                src={currentUser.avatar} // User avatar
-                alt="Profile"
-                className="rounded-full h-8 w-8 object-cover cursor-pointer border-gray-300"
-                onClick={toggleDrawer(true)}
+    <div className="flex items-center justify-between fixed top-3 left-0 right-0 max-w-4xl mx-auto space-x-5 bg-slate-600 text-slate-100 px-6 py-3 rounded-full shadow-lg z-50">
+      {/* Logo */}
+      <Link to="/">
+        <img
+          src="./PratibimbLogo2.png"
+          alt="Pratibimb Logo"
+          className="h-10 w-auto"
+        />
+      </Link>
+      {/* Navigation Links with Hover Effects */}
+      <div className="hidden sm:flex space-x-6">
+        {navItems.map((item, idx) => (
+          <Link
+            to={item.path}
+            key={idx}
+            className="relative text-white cursor-pointer"
+          >
+            <motion.div
+              initial={{ opacity: 0.8, y: 0 }}
+              whileHover={{
+                scale: 1.1, // Scale effect
+                color: "#ffffff",
+                y: -2, // Moves slightly up
+                transition: { type: "spring", stiffness: 300 },
+              }}
+            >
+              {item.name}
+              <motion.div
+                className="absolute left-0 -bottom-1 h-[2px] bg-white w-full origin-left"
+                initial={{ scaleX: 0 }} // Initial scale of the underline
+                whileHover={{ scaleX: 1 }} // On hover, it expands
+                transition={{ duration: 0.3 }}
               />
+            </motion.div>
+          </Link>
+        ))}
+      </div>
 
-              <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
-                {DrawerList}
-              </Drawer>
-            </span>
-          ) : (
-            <span className="text-slate-700 hover:underline">Sign in</span>
-          )}
-        </div>
-      </Menu>
-      <div className="fixed bottom-4 right-4">
-  <CoolMode>
-    <Button>Spread the Art<AnimationIcon/></Button>
-  </CoolMode>
-</div>
+      {/* Profile Avatar */}
+      
+        <Avatar
+          src={currentUser.avatar} // User avatar
+          alt={currentUser.name}
+          className="rounded-full h-10 w-10 object-cover cursor-pointer border-gray-300"
+          onClick={toggleDrawer(true)}
+        />
+
+        {/* Drawer */}
+        <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
+          {DrawerList}
+        </Drawer>
     </div>
-    
   );
 }
