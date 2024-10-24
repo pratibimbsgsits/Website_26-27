@@ -6,7 +6,7 @@ const { errorHandler } = require("../utils/errorHandler.js");
 
 const router = express.Router();
 
-router.post("/api/auth/google", async (req, res,next) => {
+router.post("/auth/google", async (req, res,next) => {
   try {
     const { name, email, avatar, enrollment } = req.body;
     
@@ -69,7 +69,7 @@ router.post("/api/auth/google", async (req, res,next) => {
   }
 });
 
-router.get("/api/auth/signout",(req,res,next)=>{
+router.get("/auth/signout",(req,res,next)=>{
   try{
     res.clearCookie('access_token');
     res.status(200).json('Sign out successfully');
