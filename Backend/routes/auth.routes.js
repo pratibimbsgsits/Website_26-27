@@ -9,9 +9,8 @@ const router = express.Router();
 router.post("/api/auth/google", async (req, res,next) => {
   try {
     const { name, email, avatar, enrollment } = req.body;
-    console.log(req.body);
     
-
+  
     const existingUser = await db("users").where({ email }).first();
 
     if (existingUser) {

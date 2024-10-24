@@ -14,9 +14,9 @@ const razorpay = new Razorpay({
 const getEvents = async (req, res) => {
   try {
     const { status } = req.query;
-    console.log("Fetching events with status:", status); // Log the incoming status
-    const events = await db("events").select("*").where("status", status);
-    console.log("Fetched events:", events); // Log the fetched events
+    //console.log("Fetching events with status:", status); // Log the incoming status
+    const events = await db("events").select("*").where("status", status).orderBy("start_date", "desc");
+    //console.log("Fetched events:", events); // Log the fetched events
 
     if (!events) {
       return res
@@ -55,8 +55,9 @@ const getEvents = async (req, res) => {
 
 const registerEvents = async (req, res) => {
   try {
-    const { event_id } = req.params;
+    const { event_id } = req.query;
     const { team_name, team_members, name, email, phone } = req.body;
+    
 
     if (!event_id) {
       return res

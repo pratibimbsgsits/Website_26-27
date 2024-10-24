@@ -82,7 +82,8 @@ export default function SignUp() {
       });
 
       const data = await res.json();
-
+      console.log(data);
+      
       if (data.errors && data.errors.status == 404) {
         toast.error(data.errors.detail);
         signInFailure(data.errors);
