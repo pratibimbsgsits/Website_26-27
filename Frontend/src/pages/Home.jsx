@@ -54,9 +54,14 @@ const people = [
 ];
 
   const images = [
-    "https://images.unsplash.com/photo-1485433592409-9018e83a1f0d?q=80&w=1814&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1483982258113-b72862e6cff6?q=80&w=3456&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1482189349482-3defd547e0e9?q=80&w=2848&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://res.cloudinary.com/dhy548whh/image/upload/v1729783423/rjcrohc5kjered7k9e0u.heic",
+    "https://res.cloudinary.com/dhy548whh/image/upload/v1729783443/wx9b0fqtjbrefbutytk2.jpg",
+    "https://res.cloudinary.com/dhy548whh/image/upload/v1729783451/muc91zcge8ieu73wcv92.heic",
+    "https://res.cloudinary.com/dhy548whh/image/upload/v1729783464/uhhgbhm9iy3wqsdrdmu8.jpg",
+    "https://res.cloudinary.com/dhy548whh/image/upload/v1729783471/key2lzept0d4lfauqj85.jpg",
+    "https://res.cloudinary.com/dhy548whh/image/upload/v1729783477/ibkqx7avojzcgptnpd5h.jpg",
+    "https://res.cloudinary.com/dhy548whh/image/upload/v1729783494/g10d8iewbzhjxitzx6qa.jpg",
+    "https://res.cloudinary.com/dhy548whh/image/upload/v1729783496/nd5lefydm7boxosreni0.jpg"
   ];
 
  
